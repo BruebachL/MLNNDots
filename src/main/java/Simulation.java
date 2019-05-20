@@ -48,7 +48,7 @@ public class Simulation extends JComponent implements KeyListener {
                 frame.repaint();
                 testPop.update();
                 try {
-                    TimeUnit.MILLISECONDS.sleep(20);
+                    TimeUnit.MILLISECONDS.sleep(15);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -67,10 +67,12 @@ public class Simulation extends JComponent implements KeyListener {
             }
             g.fillRect((int) testPop.dots[i].position.x, (int) testPop.dots[i].position.y, 10, 10);
         }
-        g.drawString( "Generation: " + testPop.generation,100,100);
-        g.drawString( "Global Minstep: " + testPop.minStep,100,150);
-        g.drawString( "BestDot Step: " + testPop.dots[testPop.bestDot].dotStep,100,200);
-        g.drawString( "Pop size: " + testPop.dots.length,100,250);
+        g.drawString( "Generation: " + testPop.generation,800,100);
+        g.drawString( "Global Minstep: " + testPop.minStep,800,150);
+        g.drawString( "BestDot Step: " + testPop.dots[testPop.bestDot].dotStep,800,200);
+        g.drawString( "Pop size: " + testPop.dots.length,800,250);
+        g.drawString("Global Fitness: " + testPop.fitnessSum, 800, 300);
+        g.drawString("BestDot Fitness: " + testPop.championFitness,800,350);
         g.setColor(Color.BLUE);
         g.fillRect((int) testPop.dots[testPop.bestDot].position.x, (int) testPop.dots[testPop.bestDot].position.y, 10, 10);
     }

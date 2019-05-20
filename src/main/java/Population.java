@@ -6,13 +6,13 @@ public class Population {
     double fitnessSum;
     int generation=0;
     int bestDot=0;
-    int minStep=250;
-    boolean test = false;
+    int minStep=400;
+    double championFitness;
 
     public Population(int size){
         dots = new Dot[size];
         for(int i = 0; i<dots.length;i++){
-            dots[i] = new Dot(new Vector2(500,500));
+            dots[i] = new Dot(new Vector2(500,400));
         }
     }
 
@@ -20,8 +20,9 @@ public class Population {
         for (Dot dot : dots) {
             if(dot.dotStep>minStep){
                 dot.alive=false;
+            }else {
+                dot.update();
             }
-            dot.update();
         }
     }
 
@@ -55,7 +56,7 @@ public class Population {
 
     dots = newDots.clone();
     generation++;
-    fitnessSum=0;
+    //fitnessSum=0;
     }
 
     void mutateBbys(){
@@ -74,9 +75,9 @@ public class Population {
 
     Dot selectParent(){
         Random rand = new Random();
-        System.out.println("Fitness Sun: " + fitnessSum);
+        //System.out.println("Fitness Sun: " + fitnessSum);
         double randNumber = Math.random()*fitnessSum;
-        System.out.println("RNG: " + randNumber);
+        //System.out.println("RNG: " + randNumber);
         double runningSum = 0;
         for(int i = 0; i<dots.length;i++){
             runningSum += dots[i].fitness;
@@ -102,9 +103,10 @@ public class Population {
         //System.out.println("Finished evaluation ---------------------");
         bestDot=maxIndex;
         System.out.println(dots[bestDot].reachedGoal);
-        if(dots[bestDot].reachedGoal){
+        if(dots[bestDot].reachedGoal||dots[bestDot].alive){
             minStep=dots[bestDot].dotStep;
         }
+        championFitness=dots[bestDot].fitness;
     }
 
 }

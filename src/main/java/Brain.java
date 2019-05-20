@@ -26,9 +26,9 @@ public class Brain {
     }
 
     void mutate(){
-        double random = Math.random();
-        double mutationRate = 0.01;
+        double mutationRate = 0.001;
         for(int i = 0; i<directions.length;i++){
+            double random = Math.random();
             if(random<mutationRate){
                 Random dir = new Random();
                 directions[i] = new Vector2(Math.cos(dir.nextGaussian()*360),Math.sin(dir.nextGaussian()*360));
