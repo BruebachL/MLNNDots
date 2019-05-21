@@ -6,13 +6,13 @@ public class Population {
     double fitnessSum;
     int generation=0;
     int bestDot=0;
-    int minStep=400;
+    int minStep=2000;
     double championFitness;
 
     public Population(int size){
         dots = new Dot[size];
         for(int i = 0; i<dots.length;i++){
-            dots[i] = new Dot(new Vector2(500,400));
+            dots[i] = new Dot(new Vector2(500,1920.0/2.0));
         }
     }
 
@@ -20,6 +20,7 @@ public class Population {
         for (Dot dot : dots) {
             if(dot.dotStep>minStep){
                 dot.alive=false;
+                dot.ranOutOfSteps=true;
             }else {
                 dot.update();
             }

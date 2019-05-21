@@ -26,7 +26,7 @@ public class Brain {
     }
 
     void mutate(){
-        double mutationRate = 0.001;
+        double mutationRate = 0.01 - 1.0/Simulation.testPop.minStep;
         for(int i = 0; i<directions.length;i++){
             double random = Math.random();
             if(random<mutationRate){
