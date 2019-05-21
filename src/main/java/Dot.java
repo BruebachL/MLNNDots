@@ -57,11 +57,17 @@ public class Dot {
     void calculateFitness(){
         fitness=0;
         double distanceToGoal = Math.hypot(Math.abs(position.y-Simulation.goal.yPosition),Math.abs(position.x-Simulation.goal.xPosition));
-        this.fitness = 1.0/(distanceToGoal*distanceToGoal);
-        this.fitness /= 2;
-        if(!this.alive&&!this.ranOutOfSteps){
-            this.fitness /= 5;
+        if(goalVisible()) {
+            this.fitness = 1.5 + 1.0 / (distanceToGoal * distanceToGoal*distanceToGoal);
+        }else{
+            this.fitness = 1.0/(this.position.y);
+            this.fitness /= 10;
         }
+        this.fitness *= 1+zonesPassed();
+        if(!this.alive&&!this.ranOutOfSteps){
+            this.fitness /= 2;
+        }
+
         //System.out.println(fitness);
         if(this.reachedGoal){
             this.fitness = 1.0/16.0 + 100.0/(dotStep*dotStep);
@@ -73,6 +79,46 @@ public class Dot {
         baby.brain = brain.clone();
         baby.dotStep=0;
         return baby;
+    }
+
+    boolean goalVisible(){
+        for(Zone killZone : Simulation.killZones){
+            if(linesIntersect(position.x,position.y,Simulation.goal.xPosition,Simulation.goal.yPosition,killZone.xPosition,killZone.yPosition,killZone.xPosition+killZone.width, killZone.yPosition+killZone.height)){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    boolean linesIntersect(double p0_x, double p0_y, double p1_x, double p1_y, double p2_x, double p2_y, double p3_x, double p3_y){
+        {
+            double s1_x, s1_y, s2_x, s2_y;
+            s1_x = p1_x - p0_x;     s1_y = p1_y - p0_y;
+            s2_x = p3_x - p2_x;     s2_y = p3_y - p2_y;
+
+            double s, t;
+            s = (-s1_y * (p0_x - p2_x) + s1_x * (p0_y - p2_y)) / (-s2_x * s1_y + s1_x * s2_y);
+            t = ( s2_x * (p0_y - p2_y) - s2_y * (p0_x - p2_x)) / (-s2_x * s1_y + s1_x * s2_y);
+
+            if (s >= 0 && s <= 1 && t >= 0 && t <= 1)
+            {
+                // Collision detected
+                return true;
+            }
+
+            return false; // No collision
+        }
+
+    }
+
+    int zonesPassed(){
+        int zonesPassed = 0;
+        for(Zone killZone : Simulation.killZones){
+            if(this.position.y<killZone.yPosition){
+                zonesPassed++;
+            }
+        }
+        return zonesPassed/2;
     }
 
 }

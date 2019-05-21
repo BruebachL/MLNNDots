@@ -15,9 +15,9 @@ public class Simulation extends JComponent implements KeyListener {
     static Zone goal = new Zone(1920/2,100,15,15);
 
     static Zone killZone = new Zone(0,600,750,10);
-    static Zone killZone2 = new Zone(850,600,800,10);
+    static Zone killZone2 = new Zone(850,600,1800,10);
     static Zone killZone3 = new Zone(0,500,450,10);
-    static Zone killZone4 = new Zone(550,500,800,10);
+    static Zone killZone4 = new Zone(550,500,1800,10);
     static Zone[] killZones = new Zone[]{killZone,killZone2,killZone3,killZone4};
     static Population testPop = new Population(500);
 
@@ -48,7 +48,7 @@ public class Simulation extends JComponent implements KeyListener {
 
     public void run(){
         long start = System.currentTimeMillis();
-        frame.setSize(1920, 1000);
+        frame.setSize(1500, 1000);
         frame.getContentPane().add(this);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
@@ -67,7 +67,7 @@ public class Simulation extends JComponent implements KeyListener {
                     frame.repaint();
                     testPop.update();
                     try {
-                        TimeUnit.MILLISECONDS.sleep(3);
+                        TimeUnit.MILLISECONDS.sleep(1);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }

@@ -6,7 +6,7 @@ public class Population {
     double fitnessSum;
     int generation=0;
     int bestDot=0;
-    int minStep=2000;
+    int minStep=1500;
     double championFitness;
 
     public Population(int size){
