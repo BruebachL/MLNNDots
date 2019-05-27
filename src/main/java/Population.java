@@ -6,7 +6,7 @@ public class Population {
     double fitnessSum;
     int generation=0;
     int bestDot=0;
-    int minStep=1500;
+    int minStep=10;
     double championFitness;
 
     public Population(int size){
@@ -51,12 +51,14 @@ public class Population {
     newDots[0] = champion.makeBby();
     newDots[0].isChampion=true;
     for(int i = 1; i<newDots.length;i++){
+        System.out.println(selectParent());
         Dot parent = selectParent();
         newDots[i] = parent.makeBby();
     }
 
     dots = newDots.clone();
     generation++;
+    minStep+=5;
     //fitnessSum=0;
     }
 

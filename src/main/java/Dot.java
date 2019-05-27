@@ -5,6 +5,7 @@ public class Dot {
     Brain brain;
     Vector2 position;
     double fitness = 0;
+    volatile double lastFitness;
     boolean alive = true;
     boolean reachedGoal = false;
     boolean isChampion=false;
@@ -15,7 +16,7 @@ public class Dot {
     int dotStep = 0;
 
     public Dot(Vector2 p){
-        brain = new Brain(2000);
+        brain = new Brain(4000);
         this.position=p;
     }
 
@@ -29,7 +30,6 @@ public class Dot {
                 alive=false;
             }
         }
-
     }
 
     public boolean isInKillZones(){
@@ -44,40 +44,45 @@ public class Dot {
     public void move(){
         if(dotStep<brain.directions.length&&!reachedGoal) {
             acc.add(brain.directions[dotStep]);
+            acc.normalise();
             vel.add(acc);
-                vel.normalise();
-                vel.multiply(1);
+            vel.normalise();
+            vel.multiply(3);
             position.add(vel);
             dotStep++;
         }else{
+            ranOutOfSteps=true;
             alive=false;
         }
     }
 
-    void calculateFitness(){
+    double calculateFitness(){
         fitness=0;
-        double distanceToGoal = Math.hypot(Math.abs(position.y-Simulation.goal.yPosition),Math.abs(position.x-Simulation.goal.xPosition));
-        if(goalVisible()) {
-            this.fitness = 1.5 + 1.0 / (distanceToGoal * distanceToGoal*distanceToGoal);
-        }else{
-            this.fitness = 1.0/(this.position.y);
-            this.fitness /= 10;
-        }
-        this.fitness *= 1+zonesPassed();
-        if(!this.alive&&!this.ranOutOfSteps){
-            this.fitness /= 2;
-        }
 
-        //System.out.println(fitness);
+        if(goalVisible()) {
+            double distanceToGoal = Math.hypot(Math.abs(position.x-Simulation.goal.xPosition), Math.abs(position.y-Simulation.goal.yPosition));
+            this.fitness = 1.0/(1.0/(distanceToGoal*distanceToGoal));
+        }else{
+            this.fitness = 1.0/(this.position.y/1000.0);
+            if(!this.ranOutOfSteps){
+                this.fitness /= 10;
+            }
+        }
+        if(this.isChampion){
+            this.fitness *=2;
+        }
+        this.fitness *= 1+zonesPassed()*3;
         if(this.reachedGoal){
             this.fitness = 1.0/16.0 + 100.0/(dotStep*dotStep);
         }
+        return fitness;
     }
 
     Dot makeBby(){
         Dot baby = new Dot(new Vector2(1920.0/2.0,800));
         baby.brain = brain.clone();
         baby.dotStep=0;
+        baby.lastFitness=fitness;
         return baby;
     }
 
