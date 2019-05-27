@@ -4,7 +4,7 @@ import mikera.vectorz.*;
 public class Dot {
     Brain brain;
     Vector2 position;
-    double fitness = 0;
+    double fitness;
     volatile double lastFitness;
     boolean alive = true;
     boolean reachedGoal = false;
@@ -13,11 +13,12 @@ public class Dot {
     Vector2 vel = new Vector2(0,0);
     Vector2 acc = new Vector2(0,0);
 
-    int dotStep = 0;
+    int dotStep;
 
     public Dot(Vector2 p){
         brain = new Brain(4000);
         this.position=p;
+        this.dotStep=0;
     }
 
     public void update(){
@@ -49,8 +50,10 @@ public class Dot {
             vel.normalise();
             vel.multiply(3);
             position.add(vel);
+            evaluateStep();
             dotStep++;
         }else{
+            evaluateStep();
             ranOutOfSteps=true;
             alive=false;
         }
@@ -79,11 +82,20 @@ public class Dot {
     }
 
     Dot makeBby(){
-        Dot baby = new Dot(new Vector2(1920.0/2.0,800));
+        Dot baby = new Dot(new Vector2(600,700));
         baby.brain = brain.clone();
-        baby.dotStep=0;
         baby.lastFitness=fitness;
         return baby;
+    }
+
+    void evaluateStep(){
+        lastFitness=fitness;
+        double stepFitness = calculateFitness()-lastFitness;
+        brain.weights.put(getDotStep(),stepFitness);
+    }
+
+    int getDotStep(){
+        return this.dotStep;
     }
 
     boolean goalVisible(){

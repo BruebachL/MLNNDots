@@ -12,7 +12,7 @@ public class Population {
     public Population(int size){
         dots = new Dot[size];
         for(int i = 0; i<dots.length;i++){
-            dots[i] = new Dot(new Vector2(500,1920.0/2.0));
+            dots[i] = new Dot(new Vector2(600,700));
         }
     }
 
@@ -51,7 +51,6 @@ public class Population {
     newDots[0] = champion.makeBby();
     newDots[0].isChampion=true;
     for(int i = 1; i<newDots.length;i++){
-        System.out.println(selectParent());
         Dot parent = selectParent();
         newDots[i] = parent.makeBby();
     }
@@ -105,7 +104,6 @@ public class Population {
         }
         //System.out.println("Finished evaluation ---------------------");
         bestDot=maxIndex;
-        System.out.println(dots[bestDot].reachedGoal);
         if(dots[bestDot].reachedGoal||dots[bestDot].alive){
             minStep=dots[bestDot].dotStep;
         }

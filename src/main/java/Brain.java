@@ -1,8 +1,11 @@
 import mikera.vectorz.*;
+
+import java.util.HashMap;
 import java.util.Random;
 
 public class Brain {
     Vector2[] directions;
+    HashMap<Integer, Double> weights = new HashMap<Integer, Double>();
     double mutationRate;
     int size;
 
@@ -29,19 +32,24 @@ public class Brain {
         for(int i = 0; i<directions.length;i++){
             clone.directions[i] = (Vector2)directions[i].copy();
         }
+        for(int i = 0; i<weights.size();i++){
+            clone.weights.put(i, weights.get(i));
+        }
         return clone;
     }
 
     void mutate(){
-        mutationRate = 0.01;
+        mutationRate = 0.05;
         Simulation.mutationRateTracker = mutationRate;
-        for(int i = 0; i<directions.length;i++){
+        Random dir = new Random();
+        for(int i = 0; i<weights.size();i++){
             double random = Math.random();
-            if(random<mutationRate){
-                Random dir = new Random();
-                //directions[i] = new Vector2(Math.cos(dir.nextGaussian()*360),Math.sin(dir.nextGaussian()*360));
-                directions[i].x += Math.cos(dir.nextGaussian()*20-10);
-                directions[i].y += Math.sin(dir.nextGaussian()*20-10);
+            if(random<mutationRate&&weights.get(i)>0){
+                directions[i] = new Vector2(Math.cos(dir.nextGaussian()*360),Math.sin(dir.nextGaussian()*360));
+                //directions[i].x += Math.cos(dir.nextGaussian()*90-180);
+                //directions[i].y += Math.sin(dir.nextGaussian()*90-180);
+            }else if(weights.get(i)>0){
+                System.out.println("Rejected mutation due to positive weight. Weight: " + weights.get(i));
             }
         }
     }

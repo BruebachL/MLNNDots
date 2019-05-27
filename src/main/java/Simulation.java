@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class Simulation extends JComponent implements KeyListener {
@@ -19,7 +20,7 @@ public class Simulation extends JComponent implements KeyListener {
     static Zone killZone3 = new Zone(0,500,450,10);
     static Zone killZone4 = new Zone(550,500,1800,10);
     static Zone[] killZones = new Zone[]{killZone,killZone2,killZone3,killZone4};
-    static Population testPop = new Population(10);
+    static Population testPop = new Population(100);
 
     static int timeStep = 20;
     static double mutationRateTracker;
@@ -40,7 +41,6 @@ public class Simulation extends JComponent implements KeyListener {
 
     static private class startSim extends AbstractAction {
         public void actionPerformed(ActionEvent e) {
-            System.out.println("F pressed");
             if(startSim){
                 startSim=false;
             }else{
