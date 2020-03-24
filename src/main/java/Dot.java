@@ -61,7 +61,7 @@ public class Dot {
 
         if(goalVisible()) {
             double distanceToGoal = Math.hypot(Math.abs(position.x-Simulation.goal.xPosition), Math.abs(position.y-Simulation.goal.yPosition));
-            this.fitness = 1.0/(1.0/(distanceToGoal*distanceToGoal));
+            this.fitness = 1.0/(distanceToGoal);
         }else{
             this.fitness = 1.0/(this.position.y/1000.0);
             if(!this.ranOutOfSteps){

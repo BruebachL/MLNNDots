@@ -51,7 +51,7 @@ public class Population {
     newDots[0] = champion.makeBby();
     newDots[0].isChampion=true;
     for(int i = 1; i<newDots.length;i++){
-        System.out.println(selectParent());
+        //System.out.println(selectParent());
         Dot parent = selectParent();
         newDots[i] = parent.makeBby();
     }

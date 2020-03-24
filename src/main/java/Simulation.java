@@ -24,6 +24,124 @@ public class Simulation extends JComponent implements KeyListener {
     static int timeStep = 20;
     static double mutationRateTracker;
 
+    public static void main(String[] args){
+        Simulation test = new Simulation();
+        test.run();
+    }
+
+    public void run(){
+        long start = System.currentTimeMillis();
+
+        swingInit();
+
+        while(true) {
+            if(startSim) {
+                if (testPop.allDotsDead()) {
+                    testPop.calculateFitness();
+                    testPop.naturalSelection();
+                    testPop.mutateBbys();
+                } else {
+                    frame.repaint();
+                    testPop.update();
+                    try {
+                        TimeUnit.MILLISECONDS.sleep(timeStep);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+
+
+    public void paintComponent(Graphics g) {
+
+        // render Goal
+
+        g.setColor(Color.black);
+        g.fillRect(goal.xPosition,goal.yPosition,goal.width,goal.height);
+
+        // render Killzones
+
+        for(Zone killZone : killZones) {
+            g.setColor(Color.ORANGE);
+            g.fillRect(killZone.xPosition, killZone.yPosition, killZone.width, killZone.height);
+        }
+
+        // start drawing some dots
+
+        int dotTracker = 0;
+        for(int i = 0; i<testPop.dots.length;i++) {
+
+            // color dots according to their fitness. Fitter dots appear as more purple, unfit dots are red
+
+            Color fitnessShade = new Color(255,0,(int) (sigmoid(testPop.dots[i].calculateFitness())*255.0));
+
+            g.setColor(fitnessShade);
+
+            // actually render the dot
+
+            g.fillOval((int) testPop.dots[i].position.x, (int) testPop.dots[i].position.y, 10, 10);
+
+            // Display the distance of the dot to the goal next to it. We use a string builder so things actually refresh in Swing
+
+            StringBuilder distanceToGoal = new StringBuilder();
+            distanceToGoal.append(Math.hypot(Math.abs(testPop.dots[i].position.x-Simulation.goal.xPosition), Math.abs(testPop.dots[i].position.y-Simulation.goal.yPosition)));
+            String dist = distanceToGoal.toString();
+            g.drawString(dist, (int)testPop.dots[i].position.x + 10, (int)testPop.dots[i].position.y);
+
+            // Add the dot to the global list display of dot fitness values
+
+            StringBuilder display = new StringBuilder();
+            display.append(dotTracker);
+            display.append(" Fitness: ");
+            display.append(testPop.dots[i].lastFitness);
+            String displayString = display.toString();
+            g.drawString(displayString, 50, 50 * dotTracker + 50);
+            dotTracker++;
+        }
+
+        // Display a bunch of stats
+
+        g.drawString("Generation: " + testPop.generation,1700,100);
+        g.drawString("Global Minstep: " + testPop.minStep,1700,150);
+        g.drawString("BestDot Step: " + testPop.dots[testPop.bestDot].dotStep,1700,200);
+        g.drawString("Pop size: " + testPop.dots.length,1700,250);
+        g.drawString("Global Fitness: " + testPop.fitnessSum, 1700, 300);
+        g.drawString("BestDot Fitness: " + testPop.championFitness,1700,350);
+        g.drawString("BestDot Fitness Percentage: " + testPop.championFitness/(testPop.fitnessSum/100.0),1650,400);
+        g.drawString(testPop.bestDot + " ", 50,25);
+        StringBuilder letsUpdate = new StringBuilder();
+        letsUpdate.append(mutationRateTracker);
+        String mR = letsUpdate.toString();
+        g.drawString(mR, 50,10);
+
+        // color the champion as blue
+
+        g.setColor(Color.BLUE);
+        g.fillRect((int) testPop.dots[testPop.bestDot].position.x, (int) testPop.dots[testPop.bestDot].position.y, 10, 10);
+    }
+
+    public static double sigmoid(double x) {
+        return (1/( 1 + Math.pow(Math.E,(-1*x))));
+    }
+
+    public void swingInit(){
+        frame.setSize(1920, 1000);
+        frame.getContentPane().add(this);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+        frame.setFocusable(true);
+        frame.requestFocusInWindow();
+        frame.add(listener);
+        listener.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F"), "startSim");
+        listener.getActionMap().put("startSim", new startSim());
+        listener.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("E"), "slowDown");
+        listener.getActionMap().put("slowDown", new slowDown());
+        listener.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("Q"), "speedUp");
+        listener.getActionMap().put("speedUp", new speedUp());
+    }
+
     public void keyTyped(KeyEvent e) {
     }
 
@@ -31,11 +149,6 @@ public class Simulation extends JComponent implements KeyListener {
     }
 
     public void keyReleased(KeyEvent e) {
-    }
-
-    public static void main(String[] args){
-        Simulation test = new Simulation();
-        test.run();
     }
 
     static private class startSim extends AbstractAction {
@@ -63,88 +176,4 @@ public class Simulation extends JComponent implements KeyListener {
         }
     }
 
-    public void run(){
-        long start = System.currentTimeMillis();
-        frame.setSize(1920, 1000);
-        frame.getContentPane().add(this);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
-        frame.setFocusable(true);
-        frame.requestFocusInWindow();
-        frame.add(listener);
-        listener.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F"), "startSim");
-        listener.getActionMap().put("startSim", new startSim());
-        listener.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("E"), "slowDown");
-        listener.getActionMap().put("slowDown", new slowDown());
-        listener.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("Q"), "speedUp");
-        listener.getActionMap().put("speedUp", new speedUp());
-        while(true) {
-            if(startSim) {
-                if (testPop.allDotsDead()) {
-                    testPop.calculateFitness();
-                    testPop.naturalSelection();
-                    testPop.mutateBbys();
-                } else {
-                    frame.repaint();
-                    testPop.update();
-                    try {
-                        TimeUnit.MILLISECONDS.sleep(timeStep);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-    }
-
-
-    public void paintComponent(Graphics g) {
-        g.setColor(Color.black);
-        g.fillRect(goal.xPosition,goal.yPosition,goal.width,goal.height);
-        for(Zone killZone : killZones) {
-            g.setColor(Color.ORANGE);
-            g.fillRect(killZone.xPosition, killZone.yPosition, killZone.width, killZone.height);
-        }
-        int dotTracker = 0;
-
-        for(int i = 0; i<testPop.dots.length;i++) {
-            //g.setColor(Color.RED);
-            if(testPop.dots[i].isChampion){
-                g.setColor(Color.GREEN);
-            }
-            Color fitnessShade = new Color(255,0,(int) sigmoid(testPop.dots[i].calculateFitness())*255);
-            g.setColor(fitnessShade);
-            g.fillOval((int) testPop.dots[i].position.x, (int) testPop.dots[i].position.y, 10, 10);
-            StringBuilder distanceToGoal = new StringBuilder();
-            distanceToGoal.append(Math.hypot(Math.abs(testPop.dots[i].position.x-Simulation.goal.xPosition), Math.abs(testPop.dots[i].position.y-Simulation.goal.yPosition)));
-            String dist = distanceToGoal.toString();
-            g.drawString(dist, (int)testPop.dots[i].position.x + 10, (int)testPop.dots[i].position.y);
-
-            StringBuilder display = new StringBuilder();
-            display.append(dotTracker);
-            display.append(" Fitness: ");
-            display.append(testPop.dots[i].lastFitness);
-            String displayString = display.toString();
-            g.drawString(displayString, 50, 50 * dotTracker + 50);
-            dotTracker++;
-        }
-        g.drawString( "Generation: " + testPop.generation,1700,100);
-        g.drawString( "Global Minstep: " + testPop.minStep,1700,150);
-        g.drawString( "BestDot Step: " + testPop.dots[testPop.bestDot].dotStep,1700,200);
-        g.drawString( "Pop size: " + testPop.dots.length,1700,250);
-        g.drawString("Global Fitness: " + testPop.fitnessSum, 1700, 300);
-        g.drawString("BestDot Fitness: " + testPop.championFitness,1700,350);
-        g.drawString("BestDot Fitness Percentage: " + testPop.championFitness/(testPop.fitnessSum/100.0),1650,400);
-        g.drawString(testPop.bestDot + " ", 50,25);
-        StringBuilder letsUpdate = new StringBuilder();
-        letsUpdate.append(mutationRateTracker);
-        String mR = letsUpdate.toString();
-        g.drawString(mR, 50,10);
-        //g.setColor(Color.BLUE);
-        //g.fillRect((int) testPop.dots[testPop.bestDot].position.x, (int) testPop.dots[testPop.bestDot].position.y, 10, 10);
-    }
-
-    public static double sigmoid(double x) {
-        return (1/( 1 + Math.pow(Math.E,(-1*x))));
-    }
 }

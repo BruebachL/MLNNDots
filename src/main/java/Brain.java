@@ -33,7 +33,7 @@ public class Brain {
     }
 
     void mutate(){
-        mutationRate = 0.01;
+        mutationRate = 0.08;
         Simulation.mutationRateTracker = mutationRate;
         for(int i = 0; i<directions.length;i++){
             double random = Math.random();
